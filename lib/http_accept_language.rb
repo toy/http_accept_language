@@ -50,10 +50,14 @@ module HttpAcceptLanguage
   end
 
 end
-if defined?(ActionDispatch::Request)
-  ActionDispatch::Request.send :include, HttpAcceptLanguage
-elsif defined?(ActionDispatch::AbstractRequest)
-  ActionDispatch::AbstractRequest.send :include, HttpAcceptLanguage
-elsif defined?(ActionDispatch::CgiRequest)
-  ActionDispatch::CgiRequest.send :include, HttpAcceptLanguage
-end
+
+%w[
+  ActionDispatch::Request
+  ActionDispatch::AbstractRequest
+  ActionDispatch::CgiRequest
+  ActionController::Request
+  ActionController::AbstractRequest
+  ActionController::CgiRequest
+].find do |mod|
+  eval(mod).send(:include, HttpAcceptLanguage) rescue nil
+end or raise 'HttpAcceptLanguage not included'
